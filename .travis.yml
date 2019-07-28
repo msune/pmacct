@@ -1,6 +1,14 @@
 language: C
-compiler: gcc
-dist: trusty
+compiler:
+  - gcc
+
+matrix:
+  include:
+    - dist: disco
+      sudo: required
+    - dist: trusty
+      sudo: required
+ dist: trusty
 sudo: required
 
 install:
