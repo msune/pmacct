@@ -197,3 +197,20 @@ jobs:
   - <<: *build_test_centos_8_1
     name: "docker: Centos 8.1, CONFIG_FLAGS="
     env: CONFIG_FLAGS=""
+
+  ## User docker containers
+  - docker_hub_base:
+    stage: docker_hub
+    name: "docker_hub: base container"
+    env: PMACCT_VERSION=$(git describe --abbrev=0)
+    script:
+      - echo "Building the base container..."
+      - docker build -f docker/base/Dockerfile -t pmacct_base .
+      - git describe --exact-match HEAD
+      - if [ $? -eq 0 ]; then \
+          docker build -f docker/base/Dockerfile -t pmacct_base:latest . \
+          docker build -f docker/base/Dockerfile -t pmacct_base:${PMACCT_VERSION} . \
+          echo "Uploading to dockerhub ..." \
+        else \
+          echo "Skipping upload to dockerhub... not a release"\
+        fi
