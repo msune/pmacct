@@ -12,6 +12,8 @@ env:
 
 #Matrix of jobs
 jobs:
+  include:
+
   ## User docker containers
   - docker_hub_base:
     stage: docker_hub
@@ -25,20 +27,29 @@ jobs:
       - echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin;
 
       #Always push bleeding-edge
-      - docker push ${DOCKER_USERNAME}/base:bleeding-edge;
+      - GIT_IS_BLEEDING_EDGE=$( (git branch --contains HEAD | grep master ) || echo "")
+      - |
+        if [ "$GIT_IS_BLEEDING_EDGE" != "" ]; then
+          echo "Uploading 'bleeding-edge' tag for `git describe`...";
+          docker push ${DOCKER_USERNAME}/base:bleeding-edge;
+        fi
 
       #Upload vX.Y.Z only of it's a release commit
-      - GIT_RELEASE_TAG=`git describe --exact-match --match "v*" || echo ""`
-      - if [ "$GIT_RELEASE_TAG" != "" ]; then \
-          docker tag ${DOCKER_USERNAME}/base:bleeding-edge ${DOCKER_USERNAME}/base:${PMACCT_VERSION}; \
-          docker push ${DOCKER_USERNAME}/base:${PMACCT_VERSION}; \
+      - GIT_RELEASE_TAG=$(git describe --exact-match --match "v*" || echo "")
+      - |
+        if [ "$GIT_RELEASE_TAG" != "" ]; then
+          echo "Uploading '$PMACCT_VERSION' tag for `git describe`...";
+          docker tag ${DOCKER_USERNAME}/base:bleeding-edge ${DOCKER_USERNAME}/base:${PMACCT_VERSION};
+          docker push ${DOCKER_USERNAME}/base:${PMACCT_VERSION};
         fi
 
       #Upload "latest" if the release version is the highest
-      - if [ "$GIT_RELEASE_TAG" != "" ]; then \
-          GIT_LAST_TAG=`git tag --sort=v:refname | tail -n 1` \
-          if [ "$GIT_RELEASE_TAG" == "$GIT_LAST_TAG" ]; then \
-            docker tag ${DOCKER_USERNAME}/base:bleeding-edge ${DOCKER_USERNAME}/base:latest; \
-            docker push ${DOCKER_USERNAME}/base:latest; \
-          fi \
+      - |
+        if [ "$GIT_RELEASE_TAG" != "" ]; then
+          GIT_LAST_TAG=$(git tag --sort=v:refname | tail -n 1);
+          if [ "$GIT_RELEASE_TAG" == "$GIT_LAST_TAG" ]; then
+            echo "Uploading 'latest' tag for `git describe`...";
+            docker tag ${DOCKER_USERNAME}/base:bleeding-edge ${DOCKER_USERNAME}/base:latest;
+            docker push ${DOCKER_USERNAME}/base:latest;
+          fi
         fi
