@@ -1,0 +1,27 @@
+name: ci
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 0 * * *'  # every day at midnight
+
+jobs:
+  build-ubuntu-docker:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout pmacct
+        uses: actions/checkout@v2
+        with:
+          path: pmacct
+      - name: Build docker image for Ubuntu Bionic
+        run: |
+          docker build -f $BUILD_DOCKER_FILE_UBUNTU_BIONIC -t $BUILD_DOCKER_TAG_UBUNTU_BIONIC .
+          mkdir -p /tmp/docker/
+          docker save -o /tmp/docker/registry.tar $BUILD_DOCKER_TAG_UBUNTU_BIONIC
+      - name: Artifact docker image
+        uses: actions/upload-artifact@v2
+        with:
+          path: |
+            /tmp/docker
