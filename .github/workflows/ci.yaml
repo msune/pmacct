@@ -146,7 +146,7 @@ jobs:
         run: |
           cd pmacct
           echo "Fetching tags and history..."
-          git fetch && git fetch --tags
+          git fetch -f && git fetch --tags -f
           PMACCT_VERSION=$(git describe --abbrev=0 --match="v*")
           echo "Building the base container..."
           docker build -f docker/base/Dockerfile -t base:_build .
