@@ -24,6 +24,25 @@ jobs:
           path: pmacct
       - name: Build docker image for Ubuntu Bionic
         run: |
+          cd pmacct
+          docker build -f $BUILD_DOCKER_FILE_UBUNTU_BIONIC -t $BUILD_DOCKER_TAG_UBUNTU_BIONIC .
+          mkdir -p /tmp/docker/
+          docker save -o /tmp/docker/registry.tar $BUILD_DOCKER_TAG_UBUNTU_BIONIC
+      - name: Artifact docker image
+        uses: actions/upload-artifact@v2
+        with:
+          path: |
+            /tmp/docker
+  build-centos-docker:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout pmacct
+        uses: actions/checkout@v2
+        with:
+          path: pmacct
+      - name: Build docker image for Centos 8
+        run: |
+          cd pmacct
           docker build -f $BUILD_DOCKER_FILE_UBUNTU_BIONIC -t $BUILD_DOCKER_TAG_UBUNTU_BIONIC .
           mkdir -p /tmp/docker/
           docker save -o /tmp/docker/registry.tar $BUILD_DOCKER_TAG_UBUNTU_BIONIC
