@@ -65,11 +65,10 @@ jobs:
 
   ### Step 2: permutations
   build-and-ubuntu:
-    needs: ${{ matrix.depends-on }}
+    needs: [builder-ubuntu-docker, builder-centos-docker]
     runs-on: ubuntu-18.04
     strategy:
       matrix:
-        depends-on: [builder-ubuntu-docker, builder-centos-docker]
         docker-registry-name: [registry_ubuntu, registry_centos]
         CONFIG_FLAGS: ["--enable-debug --enable-mysql --enable-pgsql --enable-sqlite3 --enable-kafka --enable-geoipv2 --enable-jansson --enable-rabbitmq --enable-nflog --enable-ndpi --enable-zmq --enable-avro --enable-serdes --enable-redis", "--enable-mysql --enable-pgsql --enable-sqlite3 --enable-kafka --enable-geoipv2 --enable-jansson --enable-rabbitmq --enable-nflog --enable-ndpi --enable-zmq --enable-avro --enable-serdes --enable-redis", "--enable-debug --enable-jansson --enable-zmq --enable-kafka", "--enable-jansson --enable-zmq --enable-kafka", "--enable-debug --enable-jansson --enable-zmq", "--enable-jansson --enable-zmq", "--enable-debug --enable-jansson --enable-kafka --enable-avro --enable-serdes", "--enable-jansson --enable-kafka --enable-avro --enable-serdes", "--enable-debug --enable-jansson --enable-kafka", "--enable-jansson --enable-kafka", "--enable-debug --enable-zmq", "--enable-zmq", "--enable-debug --enable-jansson", "--enable-jansson", "--enable-debug", ""]
 
