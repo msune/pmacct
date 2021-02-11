@@ -35,7 +35,7 @@ jobs:
       - name: Artifact docker image
         uses: actions/upload-artifact@v2.2.2
         with:
-          name: 'registry_ubuntu_${{ GITHUB_SHA }}'
+          name: registry_ubuntu
           retention-days: 1
           path: |
             /tmp/docker
@@ -58,7 +58,7 @@ jobs:
       - name: Artifact docker image
         uses: actions/upload-artifact@v2.2.2
         with:
-          name: 'registry_centos_${{ GITHUB_SHA }}'
+          name: registry_centos
           retention-days: 1
           path: |
             /tmp/docker
@@ -70,7 +70,7 @@ jobs:
     strategy:
       matrix:
         depends-on: [builder-ubuntu-docker, builder-centos-docker]
-        docker-registry-name: [ "registry_ubuntu_${{ GITHUB_SHA }}", "registry_centos_${{ GITHUB_SHA }}" ]
+        docker-registry-name: [registry_ubuntu, registry_centos]
         CONFIG_FLAGS: ["--enable-debug --enable-mysql --enable-pgsql --enable-sqlite3 --enable-kafka --enable-geoipv2 --enable-jansson --enable-rabbitmq --enable-nflog --enable-ndpi --enable-zmq --enable-avro --enable-serdes --enable-redis", "--enable-mysql --enable-pgsql --enable-sqlite3 --enable-kafka --enable-geoipv2 --enable-jansson --enable-rabbitmq --enable-nflog --enable-ndpi --enable-zmq --enable-avro --enable-serdes --enable-redis", "--enable-debug --enable-jansson --enable-zmq --enable-kafka", "--enable-jansson --enable-zmq --enable-kafka", "--enable-debug --enable-jansson --enable-zmq", "--enable-jansson --enable-zmq", "--enable-debug --enable-jansson --enable-kafka --enable-avro --enable-serdes", "--enable-jansson --enable-kafka --enable-avro --enable-serdes", "--enable-debug --enable-jansson --enable-kafka", "--enable-jansson --enable-kafka", "--enable-debug --enable-zmq", "--enable-zmq", "--enable-debug --enable-jansson", "--enable-jansson", "--enable-debug", ""]
 
     steps:
