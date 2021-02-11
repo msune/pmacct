@@ -1,6 +1,9 @@
 name: ci
 
 on:
+  create:
+    tags:
+      - v*
   workflow_dispatch:
   push:
   pull_request:
@@ -136,12 +139,14 @@ jobs:
       - name: Checkout pmacct
         uses: actions/checkout@v2.3.4
         with:
-          fetch-depth: 0
           path: pmacct
+          #fetch-depth: 0 //Don't use; weird rewrite of tags
 
       - name: Build and upload containers
         run: |
           cd pmacct
+          echo "Fetching tags and history..."
+          git fetch && git fetch --tags
           PMACCT_VERSION=$(git describe --abbrev=0 --match="v*")
           echo "Building the base container..."
           docker build -f docker/base/Dockerfile -t base:_build .
