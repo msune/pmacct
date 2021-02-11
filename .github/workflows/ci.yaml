@@ -64,7 +64,7 @@ jobs:
             /tmp/docker
 
   ### Step 2: permutations
-  build-and-ubuntu:
+  build-and-test:
     needs: [builder-ubuntu-docker, builder-centos-docker]
     runs-on: ubuntu-18.04
     strategy:
