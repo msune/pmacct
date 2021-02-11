@@ -35,7 +35,7 @@ jobs:
       - name: Artifact docker image
         uses: actions/upload-artifact@v2.2.2
         with:
-          name: registry_ubuntu_${{ GITHUB_SHA }}
+          name: 'registry_ubuntu_${{ GITHUB_SHA }}'
           retention-days: 1
           path: |
             /tmp/docker
@@ -58,7 +58,7 @@ jobs:
       - name: Artifact docker image
         uses: actions/upload-artifact@v2.2.2
         with:
-          name: registry_centos_${{ GITHUB_SHA }}
+          name: 'registry_centos_${{ GITHUB_SHA }}'
           retention-days: 1
           path: |
             /tmp/docker
