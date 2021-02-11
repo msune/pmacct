@@ -111,6 +111,7 @@ jobs:
       - name: Checkout pmacct
         uses: actions/checkout@v2
         with:
+          fetch-depth: 0
           path: pmacct
 
       - name: Build in '${{ matrix.builder-name }}' with '${{ matrix.CONFIG_FLAGS }}'
@@ -135,6 +136,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: pmacct
+          fetch-depth: 0
 
       - name: Build and upload containers
         run: |
