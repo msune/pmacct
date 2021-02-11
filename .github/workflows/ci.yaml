@@ -24,17 +24,21 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: pmacct
+
       - name: Build docker image for Ubuntu Bionic
         run: |
           cd pmacct
           docker build -f $BUILD_DOCKER_FILE_UBUNTU_BIONIC -t $BUILD_DOCKER_TAG_UBUNTU_BIONIC .
           mkdir -p /tmp/docker/
           docker save -o /tmp/docker/registry.tar $BUILD_DOCKER_TAG_UBUNTU_BIONIC
+
       - name: Artifact docker image
         uses: actions/upload-artifact@v2.2.2
         with:
+          retention-days: 1
           path: |
             /tmp/docker
+
   builder-centos-docker:
     runs-on: ubuntu-18.04
     steps:
@@ -42,15 +46,18 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: pmacct
+
       - name: Build docker image for Centos 8
         run: |
           cd pmacct
           docker build -f $BUILD_DOCKER_FILE_UBUNTU_BIONIC -t $BUILD_DOCKER_TAG_UBUNTU_BIONIC .
           mkdir -p /tmp/docker/
           docker save -o /tmp/docker/registry.tar $BUILD_DOCKER_TAG_UBUNTU_BIONIC
+
       - name: Artifact docker image
         uses: actions/upload-artifact@v2.2.2
         with:
+          retention-days: 1
           path: |
             /tmp/docker
 
@@ -60,7 +67,7 @@ jobs:
     runs-on: ubuntu-18.04
     strategy:
       matrix:
-        CONFIG_FLAGS: ["--enable-jansson --enable-zmq", "--enable-debug --enable-jansson --enable-zmq"]
+        CONFIG_FLAGS: ["--enable-debug --enable-mysql --enable-pgsql --enable-sqlite3 --enable-kafka --enable-geoipv2 --enable-jansson --enable-rabbitmq --enable-nflog --enable-ndpi --enable-zmq --enable-avro --enable-serdes --enable-redis", "--enable-mysql --enable-pgsql --enable-sqlite3 --enable-kafka --enable-geoipv2 --enable-jansson --enable-rabbitmq --enable-nflog --enable-ndpi --enable-zmq --enable-avro --enable-serdes --enable-redis", "--enable-debug --enable-jansson --enable-zmq --enable-kafka", "--enable-jansson --enable-zmq --enable-kafka", "--enable-debug --enable-jansson --enable-zmq", "--enable-jansson --enable-zmq", "--enable-debug --enable-jansson --enable-kafka --enable-avro --enable-serdes", "--enable-jansson --enable-kafka --enable-avro --enable-serdes", "--enable-debug --enable-jansson --enable-kafka", "--enable-jansson --enable-kafka", "--enable-debug --enable-zmq", "--enable-zmq", "--enable-debug --enable-jansson", "--enable-jansson", "--enable-debug", ""]
     steps:
       - name: Checkout pmacct
         uses: actions/checkout@v2
