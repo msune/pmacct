@@ -7,6 +7,13 @@ on:
   schedule:
     - cron: '0 0 * * *'  # every day at midnight
 
+#Global vars
+env:
+  BUILD_DOCKER_FILE_UBUNTU_BIONIC=ci/Dockerfile-ubuntu-bionic-for-pmacct
+  BUILD_DOCKER_TAG_UBUNTU_BIONIC=ci/ubuntu-bionic-for-pmacct
+  BUILD_DOCKER_FILE_CENTOS_8=ci/Dockerfile-centos-8-for-pmacct
+  BUILD_DOCKER_TAG_CENTOS_8=ci/centos8-for-pmacct
+
 jobs:
   build-ubuntu-docker:
     runs-on: ubuntu-18.04
