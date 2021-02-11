@@ -33,7 +33,7 @@ jobs:
           docker save -o /tmp/docker/registry.tar $BUILD_DOCKER_TAG_UBUNTU_BIONIC
 
       - name: Artifact docker image
-        uses: actions/upload-artifact@v2.2.2
+        uses: actions/upload-artifact@v2.2.3
         with:
           retention-days: 1
           path: |
@@ -55,7 +55,7 @@ jobs:
           docker save -o /tmp/docker/registry.tar $BUILD_DOCKER_TAG_UBUNTU_BIONIC
 
       - name: Artifact docker image
-        uses: actions/upload-artifact@v2.2.2
+        uses: actions/upload-artifact@v2.2.3
         with:
           retention-days: 1
           path: |
