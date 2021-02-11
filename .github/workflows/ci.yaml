@@ -96,7 +96,6 @@ jobs:
   docker-hub:
     needs: build-and-test
     runs-on: ubuntu-18.04
-    env: PMACCT_VERSION=$(git describe --abbrev=0 --match="v*")
     if: github.event != 'pull_request'
 
     steps:
@@ -107,6 +106,7 @@ jobs:
 
       - name: Build and upload containers
         run: |
+          PMACCT_VERSION=$(git describe --abbrev=0 --match="v*")
           echo "Building the base container..."
           docker build -f docker/base/Dockerfile -t base:_build .
           echo "Building daemon containers..."
