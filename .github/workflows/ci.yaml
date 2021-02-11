@@ -110,7 +110,7 @@ jobs:
           ls -la /tmp/docker
 
       - name: Checkout pmacct
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
         with:
           fetch-depth: 0
           path: pmacct
@@ -134,10 +134,10 @@ jobs:
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     steps:
       - name: Checkout pmacct
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
         with:
-          path: pmacct
           fetch-depth: 0
+          path: pmacct
 
       - name: Build and upload containers
         run: |
