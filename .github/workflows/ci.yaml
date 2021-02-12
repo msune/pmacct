@@ -137,10 +137,9 @@ jobs:
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     steps:
       - name: Checkout pmacct
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v1 #Don't use v2 messes everything
         with:
           path: pmacct
-          #fetch-depth: 0 //Don't use; weird rewrite of tags
 
       - name: Build and upload containers
         run: |
