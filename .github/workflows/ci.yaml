@@ -51,7 +51,7 @@ jobs:
           echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin;
           #Always push bleeding-edge when pushed to master
           echo "GIT_IS_BLEEDING_EDGE is $( (git branch --contains HEAD | grep master ) || echo \"\")"
-          GIT_IS_BLEEDING_EDGE=$( (git branch --contains HEAD | grep master ) || echo "")
+          GIT_IS_BLEEDING_EDGE=$( (git branch --all --contains HEAD | grep master ) || echo "")
           if [ "$GIT_IS_BLEEDING_EDGE" != "" ]; then
             echo "Uploading 'bleeding-edge' tag for `git describe`...";
             docker tag base:_build ${DOCKER_USERNAME}/base:bleeding-edge;
