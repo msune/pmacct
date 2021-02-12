@@ -19,117 +19,8 @@ env:
 
 jobs:
 
-  ### Step 1: build container images
-  builder-ubuntu-docker:
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Checkout pmacct
-        uses: actions/checkout@v2
-        with:
-          path: pmacct
-
-      - name: Build docker image for Ubuntu Bionic
-        run: |
-          cd pmacct
-          docker build -f $BUILD_DOCKER_FILE_UBUNTU_BIONIC -t $BUILD_DOCKER_TAG_UBUNTU_BIONIC .
-          mkdir -p /tmp/docker/
-          docker save -o /tmp/docker/builder_ubuntu.tar $BUILD_DOCKER_TAG_UBUNTU_BIONIC
-
-      - name: Artifact docker image
-        uses: actions/upload-artifact@v2.2.2
-        with:
-          name: builder_ubuntu
-          retention-days: 1
-          path: |
-            /tmp/docker
-
-  builder-centos-docker:
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Checkout pmacct
-        uses: actions/checkout@v2
-        with:
-          path: pmacct
-
-      - name: Build docker image for Centos 8
-        run: |
-          cd pmacct
-          docker build -f $BUILD_DOCKER_FILE_UBUNTU_BIONIC -t $BUILD_DOCKER_TAG_UBUNTU_BIONIC .
-          mkdir -p /tmp/docker/
-          docker save -o /tmp/docker/builder_centos.tar $BUILD_DOCKER_TAG_UBUNTU_BIONIC
-
-      - name: Artifact docker image
-        uses: actions/upload-artifact@v2.2.2
-        with:
-          name: builder_centos
-          retention-days: 1
-          path: |
-            /tmp/docker
-
-  ### Step 2: permutations
-  build-and-test:
-    needs: [builder-ubuntu-docker, builder-centos-docker]
-    runs-on: ubuntu-18.04
-    strategy:
-      fail-fast: false
-      matrix:
-        builder-name: [builder_ubuntu, builder_centos]
-        CONFIG_FLAGS: [
-                "",
-                "--enable-debug",
-                "--enable-debug --enable-jansson",
-                "--enable-debug --enable-jansson --enable-kafka",
-                "--enable-debug --enable-jansson --enable-kafka --enable-avro --enable-serdes",
-                "--enable-debug --enable-jansson --enable-zmq",
-                "--enable-debug --enable-jansson --enable-zmq --enable-kafka",
-                "--enable-debug --enable-mysql --enable-pgsql --enable-sqlite3 --enable-kafka --enable-geoipv2 --enable-jansson --enable-rabbitmq --enable-nflog --enable-ndpi --enable-zmq --enable-avro --enable-serdes --enable-redis",
-                "--enable-debug --enable-zmq",
-                "--enable-jansson",
-                "--enable-jansson --enable-kafka",
-                "--enable-jansson --enable-kafka --enable-avro --enable-serdes",
-                "--enable-jansson --enable-zmq",
-                "--enable-jansson --enable-zmq --enable-kafka",
-                "--enable-mysql --enable-pgsql --enable-sqlite3 --enable-kafka --enable-geoipv2 --enable-jansson --enable-rabbitmq --enable-nflog --enable-ndpi --enable-zmq --enable-avro --enable-serdes --enable-redis",
-                "--enable-zmq"]
-    env:
-      CONFIG_FLAGS: ${{ matrix.CONFIG_FLAGS }}
-    steps:
-      - name: Info
-        run: |
-          echo "Builder: ${{ matrix.builder-name }}"
-          echo "CONFIG_FLAGS: ${{ matrix.CONFIG_FLAGS }}"
-
-      - name: Create /tmp/docker folder to copy the docker registry (artifact)
-        run: |
-          mkdir -p /tmp/docker
-
-      - uses: actions/download-artifact@v2
-        with:
-          name: ${{ matrix.builder-name }}
-          path: /tmp/docker
-
-      - name: List contents of /tmp/docker
-        run: |
-          ls -la /tmp/docker
-
-      - name: Checkout pmacct
-        uses: actions/checkout@v2.3.4
-        with:
-          fetch-depth: 0
-          path: pmacct
-
-      - name: Build in '${{ matrix.builder-name }}' with '${{ matrix.CONFIG_FLAGS }}'
-        run: |
-          cd pmacct
-          docker load -i /tmp/docker/${{ matrix.builder-name }}.tar
-          CONTAINER_ID=$(docker run --rm -it -d -v `pwd`:`pwd` -w `pwd` -e CONFIG_FLAGS $BUILD_DOCKER_TAG_UBUNTU_BIONIC:latest)
-          echo "Launched container id:" $CONTAINER_ID
-          docker exec -i $CONTAINER_ID ./ci/script.sh
-          docker stop $CONTAINER_ID
-
   ### Step 3: official dockerhub images (bleeding-edge, latest and releases)
   docker-hub:
-    needs: build-and-test
     runs-on: ubuntu-18.04
     if: github.event != 'pull_request'
     env:
@@ -143,9 +34,6 @@ jobs:
 
       - name: Build and upload containers
         run: |
-          cd pmacct
-          echo "Fetching tags and history..."
-          git fetch -f && git fetch --tags -f
           PMACCT_VERSION=$(git describe --abbrev=0 --match="v*")
           echo "Building the base container..."
           docker build -f docker/base/Dockerfile -t base:_build .
