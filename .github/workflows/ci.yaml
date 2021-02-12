@@ -34,6 +34,8 @@ jobs:
 
       - name: Build and upload containers
         run: |
+          echo "Fix mess with tags in actions/checkout"
+          git fetch -f && git fetch -f --tags
           PMACCT_VERSION=$(git describe --abbrev=0 --match="v*")
           echo "Building the base container..."
           docker build -f docker/base/Dockerfile -t base:_build .
