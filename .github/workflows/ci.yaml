@@ -50,8 +50,8 @@ jobs:
           echo "Uploading to dockerhub ...";
           echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin;
           #Always push bleeding-edge when pushed to master
-          echo "GIT_IS_BLEEDING_EDGE is $( (git branch --contains HEAD | grep master ) || echo \"\")"
           GIT_IS_BLEEDING_EDGE=$( (git branch --all --contains HEAD | grep master ) || echo "")
+          echo "GIT_IS_BLEEDING_EDGE=$GIT_IS_BLEEDING_EDGE"
           if [ "$GIT_IS_BLEEDING_EDGE" != "" ]; then
             echo "Uploading 'bleeding-edge' tag for `git describe`...";
             docker tag base:_build ${DOCKER_USERNAME}/base:bleeding-edge;
@@ -72,8 +72,8 @@ jobs:
             docker push ${DOCKER_USERNAME}/pmtelemetryd:bleeding-edge;
           fi
           #Upload vX.Y.Z only of it's a release commit
-          echo "GIT_RELEASE_TAG is $(git describe --exact-match --match \"v*\" || echo \"\")"
           GIT_RELEASE_TAG=$(git describe --exact-match --match "v*" || echo "")
+          echo "GIT_RELEASE_TAG=$GIT_RELEASE_TAG"
           if [ "$GIT_RELEASE_TAG" != "" ]; then
             echo "Uploading '$PMACCT_VERSION' tag for `git describe`...";
             docker tag base:_build ${DOCKER_USERNAME}/base:${PMACCT_VERSION};
@@ -95,8 +95,8 @@ jobs:
           fi
           #Upload "latest" if the release version is the highest
           if [ "$GIT_RELEASE_TAG" != "" ]; then
-            echo "GIT_LAST_TAG $(git tag --sort=v:refname | tail -n 1)"
             GIT_LAST_TAG=$(git tag --sort=v:refname | tail -n 1);
+            echo "GIT_LAST_TAG=$GIT_LAST_TAG"
             if [ "$GIT_RELEASE_TAG" == "$GIT_LAST_TAG" ]; then
               echo "Uploading 'latest' tag for `git describe`...";
               docker tag base:_build ${DOCKER_USERNAME}/base:latest;
