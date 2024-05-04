@@ -18,7 +18,7 @@ env:
   BUILD_DOCKER_FILE_ROCKYLINUX_9: ci/Dockerfile-rockylinux-9-for-pmacct
   BUILD_DOCKER_TAG_ROCKYLINUX_9: builder_rockylinux9
   DAEMONS: "pmacctd nfacctd sfacctd uacctd pmbgpd pmbmpd pmtelemetryd"
-
+  PLATFORMS: "amd64,arm64"
 jobs:
 
   ### Step 1: build container images
@@ -30,13 +30,23 @@ jobs:
         with:
           path: pmacct
 
+      #Xcompilation stuff
+      - name: "Set up QEMU"
+        # Add support for more platforms with QEMU (optional)
+        # https://github.com/docker/setup-qemu-action
+        uses: docker/setup-qemu-action@v3
+
+      - name: "Set up Docker buildx"
+        uses: docker/setup-buildx-action@v3
+
+      #Do the actual xbuild
       - name: Build docker image for Ubuntu Focal
         run: |
           cd pmacct
           git config --global --add safe.directory $GITHUB_WORKSPACE
           git config --global --add safe.directory $GITHUB_WORKSPACE/src/external_libs/libcdada
           git rev-parse HEAD
-          docker build -f $BUILD_DOCKER_FILE_UBUNTU_FOCAL -t $BUILD_DOCKER_TAG_UBUNTU_FOCAL .
+          docker buildx build --platform=${PLATFORMS} -f $BUILD_DOCKER_FILE_UBUNTU_FOCAL -t $BUILD_DOCKER_TAG_UBUNTU_FOCAL .
           mkdir -p /tmp/docker/
           docker save -o /tmp/docker/$BUILD_DOCKER_TAG_UBUNTU_FOCAL.tar $BUILD_DOCKER_TAG_UBUNTU_FOCAL
 
